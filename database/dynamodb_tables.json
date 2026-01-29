@@ -1,0 +1,4 @@
+[
+{"TableName": "Patients", "PartitionKey": "patient_id"},
+{"TableName": "MedicineTracking", "PartitionKey": "medicine_id"}
+]
