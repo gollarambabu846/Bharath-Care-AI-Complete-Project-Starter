@@ -1,26 +1,26 @@
-import boto3, json, uuid
+import json
+import boto3
+import uuid
+from datetime import datetime
 
-
-db = boto3.resource('dynamodb')
-table = db.Table('Patients')
-
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table("Patients")
 
 def lambda_handler(event, context):
-data = json.loads(event['body'])
 
+    body = json.loads(event["body"])
 
-patient_id = str(uuid.uuid4())
+    patient = {
+        "patientId": str(uuid.uuid4()),
+        "name": body["name"],
+        "age": body["age"],
+        "gender": body["gender"],
+        "createdAt": datetime.utcnow().isoformat()
+    }
 
+    table.put_item(Item=patient)
 
-table.put_item(Item={
-'patient_id': patient_id,
-'name': data['name'],
-'age': data['age'],
-'gender': data['gender']
-})
-
-
-return {
-'statusCode': 200,
-'body': json.dumps({'patient_id': patient_id})
-}
+    return {
+        "statusCode": 200,
+        "body": json.dumps(patient)
+    }

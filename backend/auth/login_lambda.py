@@ -1,18 +1,27 @@
 import json
+import boto3
 
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table("Users")
 
 def lambda_handler(event, context):
-body = json.loads(event['body'])
 
+    body = json.loads(event["body"])
 
-if body['username'] == 'admin' and body['password'] == 'admin123':
-return {
-'statusCode': 200,
-'body': json.dumps({'message': 'Login successful'})
-}
+    userId = body["userId"]
+    password = body["password"]
 
+    response = table.get_item(
+        Key={"userId": userId}
+    )
 
-return {
-'statusCode': 401,
-'body': json.dumps({'message': 'Invalid credentials'})
-}
+    if "Item" not in response:
+        return {
+            "statusCode": 401,
+            "body": json.dumps("User not found")
+        }
+
+    return {
+        "statusCode": 200,
+        "body": json.dumps("Login successful")
+    }
